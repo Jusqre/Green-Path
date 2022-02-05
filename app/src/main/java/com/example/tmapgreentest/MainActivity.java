@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         buttonMakeTrail = findViewById(R.id.buttonMakeTrail);
 
         LinearLayout linearLayoutTmap = (LinearLayout)findViewById(R.id.tmap);
-        tMapView.setSKTMapApiKey( "l7xxceca683302d546ada258d4ff8bd21bb1" );
+        tMapView.setSKTMapApiKey( "yourkey" );
         linearLayoutTmap.addView( tMapView );
 
         //티맵 유저 로케이션
