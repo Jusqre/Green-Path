@@ -1,6 +1,10 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
+def propertiesFile = rootProject.file("local.properties")
+def properties = new Properties()
+properties.load(new FileInputStream(propertiesFile))
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
@@ -12,11 +16,13 @@ android {
 
     defaultConfig {
         applicationId "com.example.tmapgreentest"
-        minSdkVersion 16
+        minSdkVersion 23
         targetSdkVersion 30
         multiDexEnabled true
         versionCode 1
         versionName "1.0"
+
+        buildConfigField("String", "tmaps_key", properties['tmap_api_key'])
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -37,9 +43,10 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'com.google.android.material:material:1.2.1'
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-maps:18.0.2'
     implementation platform('com.google.firebase:firebase-bom:26.1.0')
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'io.grpc:grpc-okhttp:1.32.2'
     implementation ('com.google.firebase:firebase-firestore:17.1.2')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
