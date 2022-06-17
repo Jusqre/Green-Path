@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class RecommendTrail extends Thread{
     //private static final String TAG = "Recommend";
-    static final ArrayList<TMapMarkerItem> recommendedMarker = new ArrayList();
+    static final ArrayList<TMapMarkerItem> recommendedMarker = new ArrayList<>();
     static double recommendArea; // 산책로 추천 범위
     public RecommendTrail() {}
 
