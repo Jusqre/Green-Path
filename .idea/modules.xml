@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/tmapgreentest.iml" filepath="$PROJECT_DIR$/.idea/modules/tmapgreentest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/tmapgreentest.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/tmapgreentest.app.iml" />
     </modules>
   </component>
 </project>
