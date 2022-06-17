@@ -6,18 +6,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.content.DialogInterface;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 
-import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,28 +25,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import com.skt.Tmap.TMapCircle;
-import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapGpsManager;
 import com.skt.Tmap.TMapMarkerItem;
 import com.skt.Tmap.TMapPoint;
-import com.skt.Tmap.TMapPolyLine;
 import com.skt.Tmap.TMapView;
-import org.xml.sax.SAXException;
-
-import java.io.IOException;
-import java.util.ArrayList;
 
 import java.util.Objects;
-import java.util.Random;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 // 1m 당 lat = 0.000009, long = 0.0000113
 
-@SuppressWarnings("unchecked")
-public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback
-{
+public class MainActivity extends AppCompatActivity implements TMapGpsManager.onLocationChangedCallback {
 
     Button buttonRecommend; // 산책로 추천 버튼
     Button buttonMakeTrail; // 산책로 생성버튼
@@ -58,18 +43,18 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     static double enteredDistance; // 입력한 산책로 생성 길이
 
     //티맵 호출
+    @SuppressLint("StaticFieldLeak")
     static TMapView tMapView = null;
     static TMapPoint userPoint = new TMapPoint(37.279669, 127.043504);
 
     static double latA = 0;
-    static double lngA =0;
+    static double lngA = 0;
     static MakeTrail maketr1;
     static TMapMarkerItem UserLocation = new TMapMarkerItem();
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    protected void onCreate(Bundle savedInstanceState) throws NullPointerException
-    {
+    protected void onCreate(Bundle savedInstanceState) throws NullPointerException {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -83,9 +68,9 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         //버튼 레이아웃 지정
         buttonRecommend = findViewById(R.id.buttonRecommend);
         buttonMakeTrail = findViewById(R.id.buttonMakeTrail);
-        LinearLayout linearLayoutTmap = (LinearLayout)findViewById(R.id.tmap);
-        tMapView.setSKTMapApiKey( BuildConfig.tmaps_key );
-        linearLayoutTmap.addView( tMapView );
+        LinearLayout linearLayoutTmap = (LinearLayout) findViewById(R.id.tmap);
+        tMapView.setSKTMapApiKey(BuildConfig.tmaps_key);
+        linearLayoutTmap.addView(tMapView);
 
         //티맵 유저 로케이션
         Bitmap rbi = BitmapFactory.decodeResource(getResources(), R.drawable.poi_star);
@@ -93,19 +78,17 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         TMapGpsManager gps = new TMapGpsManager(this);
         gps.setMinTime(1000);
         gps.setMinDistance(5);
-        gps.setProvider(gps.NETWORK_PROVIDER);
+        gps.setProvider(TMapGpsManager.NETWORK_PROVIDER);
 
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 1); //위치권한 탐색 허용 관련 내용
-            }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1); //위치권한 탐색 허용 관련 내용
             return;
         }
         gps.OpenGps();
         tMapView.setTrackingMode(true);
         tMapView.setSightVisible(true);
 
-        tMapView.setCenterPoint(gps.getLocation().getLongitude(),gps.getLocation().getLatitude());
+        tMapView.setCenterPoint(gps.getLocation().getLongitude(), gps.getLocation().getLatitude());
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -117,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                             latA = document.getDouble("relat");
                             lngA = document.getDouble("relng");
 
-                            TMapMarkerItem at= new TMapMarkerItem();
+                            TMapMarkerItem at = new TMapMarkerItem();
                             at.setIcon(rbi);
                             at.setTMapPoint(new TMapPoint(latA, lngA));
                             at.setName(localName);
@@ -135,8 +118,7 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
                 });
 
 
-
-            //===============================산책로 추천=====================
+        //===============================산책로 추천=====================
 
         final AlertDialog.Builder recommendAlert = new AlertDialog.Builder(this);
 
@@ -147,38 +129,33 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
         RecommendTrail Recommend = new RecommendTrail();
 
 
-
         recommendAlert.setPositiveButton("OK", (dialog, whichButton) -> {
-            if (Recommend.isAlive())
-            {
+            if (Recommend.isAlive()) {
                 Recommend.interrupt();
             }
             RecommendTrail Recommend1 = new RecommendTrail();
 //
 
             RecommendTrail.recommendArea = Integer.parseInt(recommendInput.getText().toString());
-            if (RecommendTrail.recommendArea != 0)
-            {
+            if (RecommendTrail.recommendArea != 0) {
                 Recommend1.start();
             }
         });
 
         recommendAlert.setNeutralButton("RESET", (dialog, which) -> {
-            for (int i =0; i< RecommendTrail.recommendedMarker.size(); i++)
-            {
+            for (int i = 0; i < RecommendTrail.recommendedMarker.size(); i++) {
                 RecommendTrail.recommendedMarker.get(i).setVisible(TMapMarkerItem.HIDDEN);
             }
         });
 
         buttonRecommend.setOnClickListener(view -> {
-            if (recommendInput.getParent() != null){
-                ((ViewGroup) recommendInput.getParent()).removeView(recommendInput);}
+            if (recommendInput.getParent() != null) {
+                ((ViewGroup) recommendInput.getParent()).removeView(recommendInput);
+            }
 
             AlertDialog RR = recommendAlert.create();
             RR.show();
         });
-
-
 
 
         //===============================산책로 생성=====================
@@ -193,14 +170,12 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
 
 
         alert.setPositiveButton("OK", (dialogInterface, whichButton) -> {
-            if (MakeTrail.isAlive())
-            {
+            if (MakeTrail.isAlive()) {
                 MakeTrail.interrupt();
             }
             maketr1 = new MakeTrail();
             enteredDistance = Integer.parseInt(inputDistance.getText().toString());
-            if (enteredDistance !=0)
-            {
+            if (enteredDistance != 0) {
                 maketr1.start();
             }
         });
@@ -213,8 +188,9 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
 
         // 산책로 생성 클릭할 때 온클리커
         buttonMakeTrail.setOnClickListener(view -> {
-            if (inputDistance.getParent() != null){
-                ((ViewGroup) inputDistance.getParent()).removeView(inputDistance);}
+            if (inputDistance.getParent() != null) {
+                ((ViewGroup) inputDistance.getParent()).removeView(inputDistance);
+            }
 
             AlertDialog MM = alert.create();
             MM.show();
@@ -225,25 +201,20 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
 
     @Override
     public void onLocationChange(Location location) {
-        boolean tM = true;
-        if (tM){
-            tMapView.setLocationPoint(location.getLongitude(),location.getLatitude());
-            userPoint = tMapView.getLocationPoint();
-            moveUser();
-        }
+        tMapView.setLocationPoint(location.getLongitude(), location.getLatitude());
+        userPoint = tMapView.getLocationPoint();
+        moveUser();
     }
 
-    public void moveUser()
-    {
+    public void moveUser() {
         tMapView.removeMarkerItem("User Location");
 
         UserLocation.setPosition(0.5f, 1.0f);
-        UserLocation.setTMapPoint( userPoint );
+        UserLocation.setTMapPoint(userPoint);
         UserLocation.setName("사용자 현재 위치");
         tMapView.addMarkerItem("User Location", UserLocation);
     }
 
-    
 
 }
 
